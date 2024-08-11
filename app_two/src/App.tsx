@@ -30,10 +30,9 @@ function App() {
         setMessageHistory((prevMessageHistory) =>
           prevMessageHistory.concat([e.data])
         );
-
-        port2.start();
       };
     };
+
     window.addEventListener("message", handleIframeMessage);
 
     // Clean up the event listener when the component unmounts
@@ -43,19 +42,19 @@ function App() {
     };
   }, []);
 
-  const sendMessageToIframe = (message: Message) => {
+  const sendMessageToIframeParent = (message: Message) => {
     if (!port2Ref?.current) return;
     port2Ref.current.postMessage(message);
   };
 
-  const handleSendButton = () => {
+  const handleMessageSubmit = () => {
     const messageToSend: Message = {
       id: crypto.randomUUID(),
       text: message,
       date: new Date(),
       appName: "iframe",
     };
-    sendMessageToIframe(messageToSend);
+    sendMessageToIframeParent(messageToSend);
     setMessage("");
     setMessageHistory((prevMessageHistory) =>
       prevMessageHistory.concat([messageToSend])
@@ -72,14 +71,29 @@ function App() {
               className={`message ${isIncomingMessage ? "incoming" : ""}`}
               key={m.id}
             >
-              <p>{m.appName}</p>
-              <p>{m.text}</p>
-              <p>{m.date.toDateString()}</p>
+              <p className="app-name">{m.appName}</p>
+              <p className="text">{m.text}</p>
+              <p className="date">
+                {m.date.toLocaleString("en-us", {
+                  weekday: "short",
+                  year: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </p>
             </div>
           );
         })}
       </div>
-      <div className="message-form">
+      <form
+        className="message-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleMessageSubmit();
+        }}
+      >
         <input
           type="text"
           name="message"
@@ -90,8 +104,8 @@ function App() {
             setMessage(e.target.value);
           }}
         />
-        <button onClick={handleSendButton}>send message</button>
-      </div>
+        <button type="submit">send to parent</button>
+      </form>
     </div>
   );
 }

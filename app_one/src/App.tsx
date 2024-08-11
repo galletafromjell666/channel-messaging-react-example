@@ -26,7 +26,7 @@ function App() {
         iframeRef.current.contentWindow.postMessage(
           "port2 from parent",
           // It is good security practice to send messages only to known origins.
-          iframeOrigin, 
+          iframeOrigin,
           [channel.port2]
         );
         port1Ref.current = channel.port1;
@@ -58,7 +58,7 @@ function App() {
     port1Ref.current.postMessage(message);
   };
 
-  const handleSendButton = () => {
+  const handleMessageSubmit = () => {
     const messageToSend: Message = {
       id: crypto.randomUUID(),
       text: message,
@@ -83,14 +83,29 @@ function App() {
                 className={`message ${isIncomingMessage ? "incoming" : ""}`}
                 key={m.id}
               >
-                <p>{m.appName}</p>
-                <p>{m.text}</p>
-                <p>{m.date.toDateString()}</p>
+                <p className="app-name">{m.appName}</p>
+                <p className="text">{m.text}</p>
+                <p className="date">
+                  {m.date.toLocaleString("en-us", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
+                </p>
               </div>
             );
           })}
         </div>
-        <div className="message-form">
+        <form
+          className="message-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleMessageSubmit();
+          }}
+        >
           <input
             type="text"
             name="message"
@@ -101,8 +116,8 @@ function App() {
               setMessage(e.target.value);
             }}
           />
-          <button onClick={handleSendButton}>send message</button>
-        </div>
+          <button type="submit">send to iframe</button>
+        </form>
       </div>
       <iframe ref={iframeRef} src={iframeOrigin} title="app two iframe" />
     </div>
