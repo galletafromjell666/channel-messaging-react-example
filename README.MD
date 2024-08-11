@@ -37,3 +37,7 @@ Now we can use the start script to initiate both projects
 ```
 
 `app_one` is the main document and runs on the port `5173`, `app_two` is the iframe and runs on the port `5174`
+
+## Media
+
+![main](https://github.com/galletafromjell666/channel-messaging-react-example/blob/8fd6d24c6ef374489718d1e0bf8df7055a1520c9/S1.png)
